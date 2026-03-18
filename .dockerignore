@@ -1,0 +1,11 @@
+node_modules
+.output
+dist
+.env
+.env.local
+*.log
+.git
+.gitignore
+README.md
+SETUP_ENV.md
+drizzle
