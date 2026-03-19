@@ -75,7 +75,7 @@ function RouteComponent() {
           </Avatar>
 
           <div className="absolute top-4 right-4">
-            <Link to="/">
+            <Link to="/settings">
               <Button className="bg-primary hover:bg-primary/90 text-white">
                 Edit profile
               </Button>

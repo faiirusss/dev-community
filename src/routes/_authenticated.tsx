@@ -1,10 +1,10 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { auth } from "~/lib/auth";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
-  const request = getWebRequest();
+  const request = getRequest();
   if (!request) return null;
 
   const session = await auth.api.getSession({

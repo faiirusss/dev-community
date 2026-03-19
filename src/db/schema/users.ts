@@ -15,11 +15,28 @@ export const users = pgTable('users', {
   image: text('image'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-
   username: text('username').unique(),
+
+  // basic section
   bio: text('bio'),
   location: text('location'),
   websiteUrl: text('website_url'),
+
+  // coding section
+  currentlyLearning: text('currently_learning'),
+  availableFor: text('available_for'),
+  skills: text('skills'),
+  currentlyHacking: text('currently_hacking'),
+
+  // personal section
+  pronouns: text('pronouns'),
+
+  // work section
+  work: text('work'),
+  education: text('education'),
+
+  // branding section
+  brandColor: text('brand_color').default('#000000'),
 })
 
 export const userRelations = relations(users, ({ many }) => ({

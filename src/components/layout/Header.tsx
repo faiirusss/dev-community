@@ -12,10 +12,15 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
+import { trpc } from "~/lib/trpc";
 
 export function Header() {
   const { session, isPending, signOut } = useAppSession();
-  const profile = session?.user;
+
+  const { data: profile } = trpc.user.getCurrentProfile.useQuery(
+    undefined,
+    { enabled: !!session }
+  );
 
   return (
     <header className="border-b border-border bg-card fixed z-50 w-full top-0 px-2">

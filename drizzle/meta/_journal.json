@@ -8,6 +8,13 @@
       "when": 1773697754544,
       "tag": "0000_free_zombie",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773935608984,
+      "tag": "0001_slim_darkhawk",
+      "breakpoints": true
     }
   ]
 }
