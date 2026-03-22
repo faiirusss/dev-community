@@ -26,6 +26,10 @@ function RouteComponent() {
       username,
     });
 
+  const { data: stats } = trpc.profile.getStats.useQuery({
+    username, 
+  })
+
   const [moreInfo, setMoreInfo] = useState(false);
 
   if (isLoading) {
@@ -123,15 +127,15 @@ function RouteComponent() {
             <div className="bg-card border shadow-sm p-4 rounded-lg space-y-4 text-muted-foreground">
               <p className="flex items-center gap-3">
                 <FileText size={18} />
-                <span>0 posts published</span>
+                <span>{stats?.postsPublished ?? 0} posts published</span>
               </p>
               <p className="flex items-center gap-3">
                 <MessageSquare size={18} />
-                <span>0 comments written</span>
+                <span>{stats?.commentsWritten ?? 0} comments written</span>
               </p>
               <p className="flex items-center gap-3">
                 <Hash size={18} />
-                <span>0 tags followed</span>
+                <span>{stats?.tagsFollowed ?? 0} tags followed</span>
               </p>
             </div>
           </div>
