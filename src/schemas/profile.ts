@@ -3,6 +3,7 @@ import { z } from "zod";
 export const updateProfileSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().email().optional(),
+  image: z.string().url().optional(),
   username: z.string().min(3, "Username must be at least 3 characters").max(50).optional(),
   websiteUrl: z.string().max(200).optional().default(""),
   location: z.string().max(200).optional().default(""),

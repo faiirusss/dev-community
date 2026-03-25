@@ -28,6 +28,7 @@ export function ProfileSettingsPage() {
       ? {
         name: profile.name ?? "",
         username: profile.username ?? "",
+        image: profile.image ?? undefined,
         websiteUrl: profile.websiteUrl ?? "",
         location: profile.location ?? "",
         bio: profile.bio ?? "",

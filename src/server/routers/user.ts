@@ -40,6 +40,7 @@ export const userRouter = router({
         .set({
           name: input.name,
           username: input.username,
+          image: input.image || null,
           websiteUrl: input.websiteUrl || null,
           location: input.location || null,
           bio: input.bio || null,

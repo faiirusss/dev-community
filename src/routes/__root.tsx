@@ -11,6 +11,7 @@ import { httpBatchLink } from "@trpc/client";
 import { trpc } from "~/lib/trpc";
 import { Toaster } from "~/components/ui/toaster";
 import { PageContainer } from "~/components/layout/PageContainer";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import appCss from "../styles/app.css?url";
 
 function makeQueryClient() {
@@ -41,7 +42,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DevTo Clone — A community of developers" },
+      { title: "Dev Community" },
       {
         name: "description",
         content:
@@ -58,6 +59,8 @@ export const Route = createRootRoute({
   }),
   component: RootComponent,
 });
+
+const convex = new ConvexReactClient((import.meta as any).env.VITE_CONVEX_URL as string || "http://localhost:3214");
 
 function RootComponent() {
   const queryClient = getQueryClient();
@@ -76,14 +79,16 @@ function RootComponent() {
 
   return (
     <RootDocument>
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
-          <PageContainer>
-            <Outlet />
-          </PageContainer>
-          <Toaster />
-        </QueryClientProvider>
-      </trpc.Provider>
+      <ConvexProvider client={convex}>
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+          <QueryClientProvider client={queryClient}>
+            <PageContainer>
+              <Outlet />
+            </PageContainer>
+            <Toaster />
+          </QueryClientProvider>
+        </trpc.Provider>
+      </ConvexProvider>
     </RootDocument>
   );
 }
