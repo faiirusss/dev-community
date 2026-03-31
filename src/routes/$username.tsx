@@ -13,6 +13,7 @@ import {
   FileText,
 } from "lucide-react";
 import { useState } from "react";
+import { useStorageUrl } from "~/hooks/use-storage-url";
 
 export const Route = createFileRoute("/$username")({
   component: RouteComponent,
@@ -29,6 +30,9 @@ function RouteComponent() {
   const { data: stats } = trpc.profile.getStats.useQuery({
     username, 
   })
+
+  // Resolve Convex storage ID if the image is coming from Convex
+  const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(profile?.image);
 
   const [moreInfo, setMoreInfo] = useState(false);
 
@@ -63,19 +67,30 @@ function RouteComponent() {
     year: "numeric",
   });
 
+  const bannerColor = profile.brandColor || "#931b1f";
+
   return (
     <PageContainer noPadding>
-      <div className="bg-[#931b1f] h-32 md:h-32 w-full absolute left-0 right-0 z-0"></div>
+      <div
+        className="h-32 md:h-32 w-full absolute left-0 right-0 z-0"
+        style={{ backgroundColor: bannerColor }}
+      ></div>
 
       <div className="max-w-[1052px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16 md:pt-18">
         <div className="bg-card border rounded-lg shadow-sm relative px-4 pb-8 pt-16 md:pt-20 flex flex-col items-center">
-          <Avatar className="absolute -top-12 md:-top-16 left-1/2 -translate-x-1/2 border-[#931b1f] border-4 md:border-8 size-24 md:size-32 z-10">
-            {profile?.image && (
-              <AvatarImage src={profile.image} alt={profile?.name ?? ""} className="object-cover" />
+          <Avatar
+            className="absolute -top-12 md:-top-16 left-1/2 -translate-x-1/2 border-4 md:border-8 size-24 md:size-32 z-10 bg-card"
+            style={{ borderColor: bannerColor }}
+          >
+            {imageLoading ? (
+              <AvatarFallback className="bg-muted" />
+            ) : imageUrl ? (
+              <AvatarImage src={imageUrl} alt={profile?.name ?? ""} className="object-cover" />
+            ) : (
+              <AvatarFallback className="text-2xl md:text-4xl bg-muted text-foreground">
+                {profile?.name?.charAt(0).toUpperCase() ?? ""}
+              </AvatarFallback>
             )}
-            <AvatarFallback className="text-2xl md:text-4xl bg-muted text-foreground">
-              {profile?.name?.charAt(0).toUpperCase() ?? "?"}
-            </AvatarFallback>
           </Avatar>
 
           <div className="absolute top-4 right-4">
@@ -121,7 +136,7 @@ function RouteComponent() {
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pb-12">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pb-24 mb-12">
           
           <div className="col-span-1">
             <div className="bg-card border shadow-sm p-4 rounded-lg space-y-4 text-muted-foreground">

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import { signOut, useSession } from "~/lib/auth-client";
 import { Header } from "~/components/layout/Header";
 
@@ -28,9 +28,9 @@ export function PageContainer({
   noPadding?: boolean
  }) {
   const { data: session, isPending } = useSession();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useLocation();
 
-  const hideHeader = pathname === "/login" || pathname === "/register";
+  const hideHeader = location.pathname === "/login" || location.pathname === "/register";
 
   const username =
     session?.user?.username ??   

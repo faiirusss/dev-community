@@ -13,6 +13,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
 import { trpc } from "~/lib/trpc";
+import { useStorageUrl } from "~/hooks/use-storage-url";
 
 export function Header() {
   const { session, isPending, signOut } = useAppSession();
@@ -21,6 +22,8 @@ export function Header() {
     undefined,
     { enabled: !!session }
   );
+
+  const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(profile?.image);
 
   return (
     <header className="border-b border-border bg-card fixed z-50 w-full top-0 px-2">
@@ -48,7 +51,11 @@ export function Header() {
         </div>
         <div className="flex items-center gap-3">
           {isPending ? (
-            <div className="h-9 w-20 animate-pulse rounded-md bg-muted" />
+            <div className="flex items-center gap-3">
+              <div className="hidden md:block h-9 w-24 animate-pulse rounded-md bg-muted" />
+              <div className="h-9 w-9 animate-pulse rounded-full bg-muted" />
+              <div className="h-9 w-9 animate-pulse rounded-full bg-muted" />
+            </div>
           ) : session ? (
             <>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -70,19 +77,25 @@ export function Header() {
                     className="rounded-full"
                   >
                     <Avatar className="h-8 w-8">
-                      {profile?.image && (
+                      {imageLoading ? (
+                        <AvatarFallback className="bg-muted" />
+                      ) : imageUrl ? (
                         <AvatarImage
-                          src={profile.image}
+                          src={imageUrl}
                           alt={profile?.name ?? ""}
                         />
+                      ) : (
+                        <AvatarFallback>
+                          {profile?.name?.charAt(0).toUpperCase() ?? ""}
+                        </AvatarFallback>
                       )}
-                      <AvatarFallback>
-                        {profile?.name?.charAt(0).toUpperCase() ?? "?"}
-                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-32" align="end">
+                <DropdownMenuContent
+                  className="w-32"
+                  align="end"
+                >
                   <DropdownMenuItem asChild>
                     <Link
                       to="/$username"

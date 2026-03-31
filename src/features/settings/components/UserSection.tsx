@@ -8,6 +8,7 @@ import type { UpdateProfileSchema } from "~/schemas/profile"
 import { Loader2 } from "lucide-react"
 import { useConvexUpload } from "~/hooks/use-convex-upload"
 import { useEffect, useState } from "react"
+import { useStorageUrl } from "~/hooks/use-storage-url"
 
 export function UserSection() {
   
@@ -25,7 +26,11 @@ export function UserSection() {
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   
-  const currentImage = watch("image")
+  const currentImage = watch("image") || session?.user?.image
+
+  // Photos are stored as storage IDs, fetch URLs from Convex
+  const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(currentImage);
+  const displayImage = previewUrl || imageUrl || currentImage;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,8 +47,8 @@ export function UserSection() {
     setUploadError(null);
 
     try {
-      const url = await uploadImage(file);
-      setValue("image", url, { shouldDirty: true, shouldValidate: true });
+      const storageId = await uploadImage(file);
+      setValue("image", storageId, { shouldDirty: true, shouldValidate: true });
 
     } catch (err) {
       
@@ -102,14 +107,19 @@ export function UserSection() {
         <div className="flex items-center gap-4">
           <div className="relative flex shrink-0">
             <Avatar className={`size-12 transition-opacity duration-300 ${isUploading ? 'opacity-50' : 'opacity-100'}`}>
-              <AvatarImage 
-                src={previewUrl || currentImage || session?.user?.image || undefined} 
-                alt={session?.user?.name ?? ""} 
-                className="object-cover"
-              />
-              <AvatarFallback className="bg-muted text-lg">
-                {(session?.user?.name ?? "U")[0]?.toUpperCase()}
-              </AvatarFallback>
+              {imageLoading ? (
+                <AvatarFallback className="bg-muted" />
+              ) : (previewUrl || imageUrl) ? (
+                <AvatarImage 
+                  src={previewUrl || imageUrl || undefined} 
+                  alt={session?.user?.name ?? ""} 
+                  className="object-cover"
+                />
+              ) : (
+                <AvatarFallback className="bg-muted text-lg">
+                  {(session?.user?.name ?? "U")[0]?.toUpperCase()}
+                </AvatarFallback>
+              )}
             </Avatar>
 
             {isUploading && (

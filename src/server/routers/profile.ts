@@ -20,6 +20,7 @@ export const profileRouter = router({
           bio: users.bio,
           location: users.location,
           websiteUrl: users.websiteUrl,
+          brandColor: users.brandColor,
           createdAt: users.createdAt,
         })
         .from(users)
