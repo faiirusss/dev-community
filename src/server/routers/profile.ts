@@ -22,6 +22,8 @@ export const profileRouter = router({
           websiteUrl: users.websiteUrl,
           brandColor: users.brandColor,
           createdAt: users.createdAt,
+          work: users.work,
+          education: users.education,
         })
         .from(users)
         .where(eq(users.username, input.username))
