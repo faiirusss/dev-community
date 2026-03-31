@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useStorageUrl } from "~/hooks/use-storage-url";
+import { ProfileWorkCard } from "~/components/profile/ProfileWorkCard";
 
 export const Route = createFileRoute("/$username")({
   component: RouteComponent,
@@ -153,6 +154,10 @@ function RouteComponent() {
                 <span>{stats?.tagsFollowed ?? 0} tags followed</span>
               </p>
             </div>
+            <ProfileWorkCard
+              work={profile?.work}
+              education={profile?.education}
+            />
           </div>
 
           <div className="col-span-1 md:col-span-2">
