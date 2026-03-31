@@ -24,6 +24,11 @@ export const profileRouter = router({
           createdAt: users.createdAt,
           work: users.work,
           education: users.education,
+          pronouns: users.pronouns,
+          skills: users.skills,
+          currentlyLearning: users.currentlyLearning,
+          currentlyHacking: users.currentlyHacking,
+          availableFor: users.availableFor,
         })
         .from(users)
         .where(eq(users.username, input.username))

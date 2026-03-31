@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useStorageUrl } from "~/hooks/use-storage-url";
-import { ProfileWorkCard } from "~/components/profile/ProfileWorkCard";
+import { ProfileSidebar } from "~/components/profile/ProfileSidebar";
 
 export const Route = createFileRoute("/$username")({
   component: RouteComponent,
@@ -135,6 +135,29 @@ function RouteComponent() {
               className="cursor-pointer hover:text-primary transition-colors"
             />
           </div>
+
+          <div className="mt-6 pt-6 border-t w-full">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {profile.education && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Education</p>
+                  <p className="font-medium text-foreground">{profile.education}</p>
+                </div>
+              )}
+              {profile.pronouns && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Pronouns</p>
+                  <p className="font-medium text-foreground">{profile.pronouns}</p>
+                </div>
+              )}
+              {profile.work && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Work</p>
+                  <p className="font-medium text-foreground">{profile.work}</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pb-24 mb-12">
@@ -154,10 +177,16 @@ function RouteComponent() {
                 <span>{stats?.tagsFollowed ?? 0} tags followed</span>
               </p>
             </div>
-            <ProfileWorkCard
-              work={profile?.work}
-              education={profile?.education}
-            />
+            <div className="mt-4">
+              <ProfileSidebar
+                skills={profile?.skills}
+                currentlyLearning={profile?.currentlyLearning}
+                currentlyHacking={profile?.currentlyHacking}
+                availableFor={profile?.availableFor}
+                work={profile?.work}
+                education={profile?.education}
+              />
+            </div>
           </div>
 
           <div className="col-span-1 md:col-span-2">
