@@ -51,7 +51,7 @@ export const profileRouter = router({
    * round-trips, which is more efficient for PostgreSQL.
    */
   getStats: publicProcedure
-    .input(z.object({ username: z.string().min(1).max(50) }))
+    .input(z.object({ username: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
       const [stats] = await ctx.db
         .select({
