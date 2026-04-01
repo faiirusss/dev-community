@@ -4,11 +4,17 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   resolve: {
-    // This replaces the "vite-tsconfig-paths" plugin
-    tsconfigPaths: true, 
+    tsconfigPaths: true,
+    alias: {
+      buffer: 'buffer/',
+    },
   },
-  plugins: [  
+  define: {
+    global: 'globalThis',
+    Buffer: ['buffer', 'Buffer'],
+  },
+  plugins: [
     tailwindcss(),
-    tanstackStart(), // By default, this looks for src/entry-client.tsx and src/entry-server.tsx
+    tanstackStart(),
   ],
 })

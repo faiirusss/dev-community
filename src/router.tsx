@@ -1,16 +1,29 @@
-import { createRouter } from "@tanstack/react-router";
+import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { QueryClient } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 import { NotFound } from "./components/NotFound";
 
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5,
+        retry: 1,
+      },
+    },
+  });
+}
+
 export function getRouter() {
-  const router = createRouter({
+  const queryClient = makeQueryClient();
+
+  return createTanStackRouter({
     routeTree,
     defaultPreload: "intent",
     scrollRestoration: true,
     defaultNotFoundComponent: () => <NotFound />,
+    context: { queryClient },
   });
-
-  return router;
 }
 
 declare module "@tanstack/react-router" {
