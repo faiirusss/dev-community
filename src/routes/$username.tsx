@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { trpc } from "~/lib/trpc";
 import { PageContainer } from "~/components/layout/PageContainer";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -6,48 +8,77 @@ import { Button } from "~/components/ui/button";
 import {
   Cake,
   ExternalLink,
-  Github,
-  Hash,
   MapPinned,
   MessageSquare,
   FileText,
+  Hash,
 } from "lucide-react";
-import { useState } from "react";
 import { useStorageUrl } from "~/hooks/use-storage-url";
 import { ProfileSidebar } from "~/components/profile/ProfileSidebar";
+import { appRouter } from "~/server/root";
+import { db } from "~/db";
+import { TRPCError } from "@trpc/server";
+
+const getProfileData = createServerFn({ method: "GET" })
+  .handler(async (ctx) => {
+    const request = getRequest();
+    if (!request) throw new Error("No request");
+
+    const url = new URL(request.url);
+    const username = url.pathname.split("/").pop();
+    if (!username) throw new Error("No username");
+
+    const caller = appRouter.createCaller({
+      req: request,
+      db,
+      session: null,
+      user: null,
+    });
+
+    try {
+      const [profileData, statsData] = await Promise.all([
+        caller.profile.getByUsername({ username }),
+        caller.profile.getStats({ username }),
+      ]);
+
+      const profile = profileData
+        ? { ...profileData, createdAt: profileData.createdAt.toISOString() }
+        : null;
+      const stats = statsData ?? null;
+
+      return { profile, stats };
+    } catch (error) {
+      if (error instanceof TRPCError && error.code === "NOT_FOUND") {
+        return { profile: null, stats: null };
+      }
+      throw error;
+    }
+  });
 
 export const Route = createFileRoute("/$username")({
+  loader: async () => {
+    return getProfileData();
+  },
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const { username } = Route.useParams();
+  const initialData = Route.useLoaderData();
 
-  const { data: profile, isLoading } =
-    trpc.profile.getByUsername.useQuery({
-      username,
-    });
+  const { data: profile } = trpc.profile.getByUsername.useQuery(
+    { username },
+    initialData.profile ? { initialData: initialData.profile } : undefined
+  );
 
-  const { data: stats } = trpc.profile.getStats.useQuery({
-    username, 
-  })
+  const { data: stats } = trpc.profile.getStats.useQuery(
+    { username },
+    initialData.stats ? { initialData: initialData.stats } : undefined
+  );
 
-  // Resolve Convex storage ID if the image is coming from Convex
-  const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(profile?.image);
-
-  const [moreInfo, setMoreInfo] = useState(false);
-
-  if (isLoading) {
-    return (
-      <PageContainer>
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <div className="animate-pulse text-muted-foreground text-lg">
-            Loading profile...
-          </div>
-        </div>
-      </PageContainer>
-    );
-  }
+  const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(
+    profile?.image,
+  );
 
   if (!profile) {
     return (
@@ -86,7 +117,11 @@ function RouteComponent() {
             {imageLoading ? (
               <AvatarFallback className="bg-muted" />
             ) : imageUrl ? (
-              <AvatarImage src={imageUrl} alt={profile?.name ?? ""} className="object-cover" />
+              <AvatarImage
+                src={imageUrl}
+                alt={profile?.name ?? ""}
+                className="object-cover"
+              />
             ) : (
               <AvatarFallback className="text-2xl md:text-4xl bg-muted text-foreground">
                 {profile?.name?.charAt(0).toUpperCase() ?? ""}
@@ -130,10 +165,6 @@ function RouteComponent() {
                 {profile.websiteUrl}
               </a>
             )}
-            <Github
-              size={18}
-              className="cursor-pointer hover:text-primary transition-colors"
-            />
           </div>
 
           <div className="mt-6 pt-6 border-t w-full">
@@ -141,13 +172,17 @@ function RouteComponent() {
               {profile.education && (
                 <div>
                   <p className="text-sm text-muted-foreground">Education</p>
-                  <p className="font-medium text-foreground">{profile.education}</p>
+                  <p className="font-medium text-foreground">
+                    {profile.education}
+                  </p>
                 </div>
               )}
               {profile.pronouns && (
                 <div>
                   <p className="text-sm text-muted-foreground">Pronouns</p>
-                  <p className="font-medium text-foreground">{profile.pronouns}</p>
+                  <p className="font-medium text-foreground">
+                    {profile.pronouns}
+                  </p>
                 </div>
               )}
               {profile.work && (
@@ -161,8 +196,15 @@ function RouteComponent() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pb-24 mb-12">
-          
           <div className="col-span-1">
+            <div className="mb-4">
+              <ProfileSidebar
+                skills={profile?.skills}
+                currentlyLearning={profile?.currentlyLearning}
+                currentlyHacking={profile?.currentlyHacking}
+                availableFor={profile?.availableFor}
+              />
+            </div>
             <div className="bg-card border shadow-sm p-4 rounded-lg space-y-4 text-muted-foreground">
               <p className="flex items-center gap-3">
                 <FileText size={18} />
@@ -177,23 +219,11 @@ function RouteComponent() {
                 <span>{stats?.tagsFollowed ?? 0} tags followed</span>
               </p>
             </div>
-            <div className="mt-4">
-              <ProfileSidebar
-                skills={profile?.skills}
-                currentlyLearning={profile?.currentlyLearning}
-                currentlyHacking={profile?.currentlyHacking}
-                availableFor={profile?.availableFor}
-                work={profile?.work}
-                education={profile?.education}
-              />
-            </div>
           </div>
 
           <div className="col-span-1 md:col-span-2">
-            <div className="h-64 rounded-lg flex items-center justify-center text-muted-foreground">
-            </div>
+            <div className="h-64 rounded-lg flex items-center justify-center text-muted-foreground"></div>
           </div>
-          
         </div>
       </div>
     </PageContainer>
