@@ -14,9 +14,9 @@ import {
 import { useStorageUrl } from "~/hooks/use-storage-url";
 import { ProfileSidebar } from "~/components/profile/ProfileSidebar";
 
-const getProfileAndStats = createServerFn({ method: "GET" })
-  .handler(async ({ data }: { data: any }) => {
-    const { username } = data as { username: string };
+const getProfileAndStats = createServerFn()
+  .handler(async ({ data }) => {
+    const { username } = (data ?? {}) as { username: string };
     const { appRouter } = await import("~/server/root");
     const { db } = await import("~/db");
     const { TRPCError } = await import("@trpc/server");
