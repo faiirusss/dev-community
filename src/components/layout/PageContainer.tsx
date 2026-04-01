@@ -38,13 +38,20 @@ export function PageContainer({
     "Guest"
 
   const signOutAction = React.useCallback(async () => {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          window.location.href = "/login";
+    try {
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            window.location.href = "/login";
+          },
+          onError: (ctx) => {
+            console.error("Sign out returned an error:", ctx.error);
+          }
         },
-      },
-    });
+      });
+    } catch (err) {
+      console.error("Failed to execute signOut:", err);
+    }
   }, []);
 
   const value = React.useMemo<AppSessionValue>(

@@ -66,7 +66,7 @@ export function ProfileSettingsPage() {
       });
       utils.user.getCurrentProfile.invalidate();
       utils.profile.getByUsername.invalidate();
-      reset({}, { keepValues: true });
+      reset(methods.getValues());
     },
     onError: (err) => {
       toast({
@@ -81,10 +81,7 @@ export function ProfileSettingsPage() {
 
   return (
     <FormProvider {...methods}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-6"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <div>
           <h1 className="font-bold text-primary text-2xl">
             @{profile?.username ?? session?.user?.name}

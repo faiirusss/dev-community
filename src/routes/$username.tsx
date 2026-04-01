@@ -1,7 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { trpc } from "~/lib/trpc";
 import { PageContainer } from "~/components/layout/PageContainer";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -15,21 +13,16 @@ import {
 } from "lucide-react";
 import { useStorageUrl } from "~/hooks/use-storage-url";
 import { ProfileSidebar } from "~/components/profile/ProfileSidebar";
-import { appRouter } from "~/server/root";
-import { db } from "~/db";
-import { TRPCError } from "@trpc/server";
 
-const getProfileData = createServerFn({ method: "GET" })
-  .handler(async (ctx) => {
-    const request = getRequest();
-    if (!request) throw new Error("No request");
-
-    const url = new URL(request.url);
-    const username = url.pathname.split("/").pop();
-    if (!username) throw new Error("No username");
+const getProfileAndStats = createServerFn({ method: "GET" })
+  .handler(async ({ data }: { data: any }) => {
+    const { username } = data as { username: string };
+    const { appRouter } = await import("~/server/root");
+    const { db } = await import("~/db");
+    const { TRPCError } = await import("@trpc/server");
 
     const caller = appRouter.createCaller({
-      req: request,
+      req: new Request("http://localhost"),
       db,
       session: null,
       user: null,
@@ -56,25 +49,15 @@ const getProfileData = createServerFn({ method: "GET" })
   });
 
 export const Route = createFileRoute("/$username")({
-  loader: async () => {
-    return getProfileData();
+  loader: async ({ params }) => {
+    return getProfileAndStats({ data: { username: params.username } } as any);
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const { username } = Route.useParams();
-  const initialData = Route.useLoaderData();
-
-  const { data: profile } = trpc.profile.getByUsername.useQuery(
-    { username },
-    initialData.profile ? { initialData: initialData.profile } : undefined
-  );
-
-  const { data: stats } = trpc.profile.getStats.useQuery(
-    { username },
-    initialData.stats ? { initialData: initialData.stats } : undefined
-  );
+  const { profile, stats } = Route.useLoaderData();
 
   const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(
     profile?.image,

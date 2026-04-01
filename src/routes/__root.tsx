@@ -2,11 +2,12 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
 } from "@tanstack/react-router";
 import * as React from "react";
 import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "~/lib/trpc";
 import { Toaster } from "~/components/ui/toaster";
@@ -14,30 +15,11 @@ import { PageContainer } from "~/components/layout/PageContainer";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import appCss from "../styles/app.css?url";
 
-function makeQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5,
-        retry: 1,
-      },
-    },
-  });
+interface MyRouterContext {
+  queryClient: QueryClient;
 }
 
-let browserQueryClient: QueryClient | undefined;
-
-function getQueryClient() {
-  if (typeof window === "undefined") {
-    return makeQueryClient();
-  }
-  if (!browserQueryClient) {
-    browserQueryClient = makeQueryClient();
-  }
-  return browserQueryClient;
-}
-
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -63,7 +45,7 @@ export const Route = createRootRoute({
 const convex = new ConvexReactClient((import.meta as any).env.VITE_CONVEX_URL as string || "http://localhost:3214");
 
 function RootComponent() {
-  const queryClient = getQueryClient();
+  const { queryClient } = Route.useRouteContext();
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [

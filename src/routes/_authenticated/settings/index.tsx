@@ -2,11 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { ProfileSettingsPage } from '~/features/settings/pages/ProfileSettingsPage'
-import { appRouter } from '~/server/root'
-import { db } from '~/db'
-import { auth } from '~/lib/auth'
 
 const getProfile = createServerFn({ method: 'GET' }).handler(async () => {
+  const { auth } = await import('~/lib/auth')
+  const { db } = await import('~/db')
+  const { appRouter } = await import('~/server/root')
+
   const request = getRequest()
   if (!request) return null
 

@@ -18,12 +18,22 @@ import { useStorageUrl } from "~/hooks/use-storage-url";
 export function Header() {
   const { session, isPending, signOut } = useAppSession();
 
-  const { data: profile } = trpc.user.getCurrentProfile.useQuery(
+  const { data: profile, isLoading: isProfileLoading, error } = trpc.user.getCurrentProfile.useQuery(
     undefined,
-    { enabled: !!session }
+    { 
+      enabled: !!session,
+      retry: 1,
+      staleTime: 1000 * 60 * 5,
+    }
   );
 
   const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(profile?.image);
+
+  const isLoading = isPending || (!!session && isProfileLoading);
+
+  if (error) {
+    console.error("Failed to load profile:", error);
+  }
 
   return (
     <header className="border-b border-border bg-card fixed z-50 w-full top-0 px-2">
@@ -50,7 +60,7 @@ export function Header() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {isPending ? (
+          {isLoading ? (
             <div className="flex items-center gap-3">
               <div className="hidden md:block h-9 w-24 animate-pulse rounded-md bg-muted" />
               <div className="h-9 w-9 animate-pulse rounded-full bg-muted" />
@@ -97,16 +107,24 @@ export function Header() {
                   align="end"
                 >
                   <DropdownMenuItem asChild>
-                    <Link
-                      to="/$username"
-                      params={{
-                        username: profile?.username ?? profile?.email ?? "",
-                      }}
-                      className="flex flex-col items-start gap-0 cursor-pointer"
-                    >
-                      <span>{profile?.name}</span>
-                      <span className="leading-none">@{profile?.username}</span>
-                    </Link>
+                    {profile?.username ? (
+                      <Link
+                        to="/$username"
+                        params={{ username: profile.username }}
+                        className="flex flex-col items-start gap-0 cursor-pointer"
+                      >
+                        <span>{profile.name}</span>
+                        <span className="leading-none">@{profile.username}</span>
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/settings"
+                        className="flex flex-col items-start gap-0 cursor-pointer"
+                      >
+                        <span>{profile?.name}</span>
+                        <span className="text-xs text-muted-foreground">Set up username</span>
+                      </Link>
+                    )}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup className="cursor-pointer">
@@ -118,7 +136,10 @@ export function Header() {
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <DropdownMenuItem
-                      onClick={signOut}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        signOut().catch(console.error);
+                      }}
                       className="cursor-pointer"
                     >
                       Log out
