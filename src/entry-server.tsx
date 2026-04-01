@@ -1,8 +1,6 @@
-import { createStartHandler, defaultRenderHandler } from '@tanstack/react-start/server'
-import { getRouter } from './router'
+import {
+  createStartHandler,
+  defaultStreamHandler,
+} from '@tanstack/react-start/server'
 
-// This MUST be a default export
-export default createStartHandler({
-  getRouter,
-  renderHandler: defaultRenderHandler,
-})
+export default createStartHandler(defaultStreamHandler)
