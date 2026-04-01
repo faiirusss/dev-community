@@ -4,6 +4,7 @@ import { db } from "~/db";
 import * as schema from "~/db/schema";
 
 const appOrigin =
+  process.env.BETTER_AUTH_URL ??
   process.env.APP_ORIGIN ??
   process.env.VITE_APP_ORIGIN ??
   (process.env.NODE_ENV === "development" ? "http://localhost:3000" : undefined);
