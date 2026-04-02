@@ -20,6 +20,9 @@ import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authen
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedPostsNewRouteImport } from './routes/_authenticated/posts/new'
+import { Route as AuthenticatedDraftsShareKeyRouteImport } from './routes/_authenticated/drafts/$shareKey'
+import { Route as AuthenticatedPostsPostIdEditRouteImport } from './routes/_authenticated/posts/$postId.edit'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -78,6 +81,23 @@ const AuthenticatedSettingsAccountRoute =
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedPostsNewRoute = AuthenticatedPostsNewRouteImport.update({
+  id: '/posts/new',
+  path: '/posts/new',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDraftsShareKeyRoute =
+  AuthenticatedDraftsShareKeyRouteImport.update({
+    id: '/drafts/$shareKey',
+    path: '/drafts/$shareKey',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPostsPostIdEditRoute =
+  AuthenticatedPostsPostIdEditRouteImport.update({
+    id: '/posts/$postId/edit',
+    path: '/posts/$postId/edit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,10 +106,13 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/drafts/$shareKey': typeof AuthenticatedDraftsShareKeyRoute
+  '/posts/new': typeof AuthenticatedPostsNewRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/posts/$postId/edit': typeof AuthenticatedPostsPostIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,10 +120,13 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/drafts/$shareKey': typeof AuthenticatedDraftsShareKeyRoute
+  '/posts/new': typeof AuthenticatedPostsNewRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/posts/$postId/edit': typeof AuthenticatedPostsPostIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,10 +137,13 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/drafts/$shareKey': typeof AuthenticatedDraftsShareKeyRoute
+  '/_authenticated/posts/new': typeof AuthenticatedPostsNewRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/posts/$postId/edit': typeof AuthenticatedPostsPostIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,10 +154,13 @@ export interface FileRouteTypes {
     | '/register'
     | '/settings'
     | '/dashboard'
+    | '/drafts/$shareKey'
+    | '/posts/new'
     | '/settings/account'
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/settings/'
+    | '/posts/$postId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -136,10 +168,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/drafts/$shareKey'
+    | '/posts/new'
     | '/settings/account'
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/settings'
+    | '/posts/$postId/edit'
   id:
     | '__root__'
     | '/'
@@ -149,10 +184,13 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authenticated/settings'
     | '/_authenticated/dashboard'
+    | '/_authenticated/drafts/$shareKey'
+    | '/_authenticated/posts/new'
     | '/_authenticated/settings/account'
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/_authenticated/settings/'
+    | '/_authenticated/posts/$postId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +282,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/posts/new': {
+      id: '/_authenticated/posts/new'
+      path: '/posts/new'
+      fullPath: '/posts/new'
+      preLoaderRoute: typeof AuthenticatedPostsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/drafts/$shareKey': {
+      id: '/_authenticated/drafts/$shareKey'
+      path: '/drafts/$shareKey'
+      fullPath: '/drafts/$shareKey'
+      preLoaderRoute: typeof AuthenticatedDraftsShareKeyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/posts/$postId/edit': {
+      id: '/_authenticated/posts/$postId/edit'
+      path: '/posts/$postId/edit'
+      fullPath: '/posts/$postId/edit'
+      preLoaderRoute: typeof AuthenticatedPostsPostIdEditRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -266,11 +325,17 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDraftsShareKeyRoute: typeof AuthenticatedDraftsShareKeyRoute
+  AuthenticatedPostsNewRoute: typeof AuthenticatedPostsNewRoute
+  AuthenticatedPostsPostIdEditRoute: typeof AuthenticatedPostsPostIdEditRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDraftsShareKeyRoute: AuthenticatedDraftsShareKeyRoute,
+  AuthenticatedPostsNewRoute: AuthenticatedPostsNewRoute,
+  AuthenticatedPostsPostIdEditRoute: AuthenticatedPostsPostIdEditRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

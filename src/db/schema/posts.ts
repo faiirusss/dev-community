@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, boolean, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, boolean, timestamp, integer } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 import { users } from './users'
 import { postTags } from './post_tags'
@@ -17,6 +17,12 @@ export const posts = pgTable('posts', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   publishedAt: timestamp('published_at'),
+  description: text('description'),
+  scheduledAt: timestamp('scheduled_at'),
+  canonicalUrl: text('canonical_url'),
+  readingTime: integer('reading_time'),
+  wordCount: integer('word_count'),
+  editedAt: timestamp('edited_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 

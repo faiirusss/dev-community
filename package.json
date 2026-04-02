@@ -39,6 +39,7 @@
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.39.3",
     "lucide-react": "^0.474.0",
+    "md-editor-rt": "^6.4.1",
     "pg": "^8.13.3",
     "radix-ui": "^1.4.3",
     "react": "^19.0.0",
