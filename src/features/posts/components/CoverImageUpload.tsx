@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useConvexUpload } from "~/hooks/use-convex-upload";
+import { useStorageUrl } from "~/hooks/use-storage-url";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { X, ImagePlus } from "lucide-react";
+import { X, ImagePlus, Loader2 } from "lucide-react";
 
 export function CoverImageUpload({
   value,
@@ -18,7 +19,9 @@ export function CoverImageUpload({
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { uploadImage } = useConvexUpload();
+  const { url: resolvedImageUrl, isLoading: imageLoading } = useStorageUrl(value);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -51,11 +54,21 @@ export function CoverImageUpload({
   };
 
   const uploadFile = async (file: File) => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+
     setIsUploading(true);
     setError(null);
     try {
       const storageId = await uploadImage(file);
       onChange(storageId);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -66,16 +79,36 @@ export function CoverImageUpload({
   const handleRemove = () => {
     onChange(undefined);
     setError(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
   };
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   if (value) {
+    const displayUrl = previewUrl || resolvedImageUrl;
+    
     return (
       <div className="relative">
-        <img
-          src={value}
-          alt={altValue || "Cover"}
-          className="w-full h-64 object-cover rounded-lg"
-        />
+        {imageLoading && !previewUrl ? (
+          <div className="w-full h-64 bg-muted rounded-lg flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <img
+            src={displayUrl || undefined}
+            alt={altValue || "Cover"}
+            className="w-full h-64 object-cover rounded-lg"
+          />
+        )}
         <div className="absolute top-2 right-2 flex gap-2">
           <Button
             type="button"
@@ -109,7 +142,20 @@ export function CoverImageUpload({
         isDragging ? "border-primary bg-primary/5" : "border-border"
       }`}
     >
-      <ImagePlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+      {isUploading && previewUrl ? (
+        <div className="relative mb-4">
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="w-full h-48 object-cover rounded-lg opacity-50"
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        </div>
+      ) : (
+        <ImagePlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+      )}
       <p className="text-muted-foreground mb-4">
         {isUploading
           ? "Uploading..."

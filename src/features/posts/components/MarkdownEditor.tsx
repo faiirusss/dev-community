@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { MdEditor, ToolbarNames } from 'md-editor-rt';
+import { MdEditor, MdPreview, ToolbarNames } from 'md-editor-rt';
 import 'md-editor-rt/lib/style.css';
+import 'md-editor-rt/lib/preview.css';
 import { useConvexUpload } from '~/hooks/use-convex-upload';
 
 export function MarkdownEditor({
@@ -46,15 +47,27 @@ export function MarkdownEditor({
     'preview'
   ];
 
+  if (preview) {
+    return (
+      <div className="relative">
+        <MdPreview
+          modelValue={value}
+          language="en-US"
+          style={{ minHeight: '500px' }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <MdEditor
         modelValue={value}
         onChange={onChange}
-        preview={preview}
         toolbars={toolbars}
         onUploadImg={handleUploadImage}
         placeholder="Write your post content here..."
+        language="en-US"
         style={{ height: '500px' }}
       />
       {isUploading && (

@@ -70,7 +70,7 @@ export function TagsInput({
             placeholder={
               value.length === 0 ? "Add up to 4 tags..." : "Add another tag..."
             }
-            className="w-40 border-0 focus-visible:ring-0 p-0 h-auto"
+            className="w-40 border-0 focus-visible:ring-0 p-2 h-auto"
           />
         )}
       </div>
