@@ -18,16 +18,19 @@ import { useStorageUrl } from "~/hooks/use-storage-url";
 export function Header() {
   const { session, isPending, signOut } = useAppSession();
 
-  const { data: profile, isLoading: isProfileLoading, error } = trpc.user.getCurrentProfile.useQuery(
-    undefined,
-    { 
-      enabled: !!session,
-      retry: 1,
-      staleTime: 1000 * 60 * 5,
-    }
-  );
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error,
+  } = trpc.user.getCurrentProfile.useQuery(undefined, {
+    enabled: !!session,
+    retry: 1,
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(profile?.image);
+  const { url: imageUrl, isLoading: imageLoading } = useStorageUrl(
+    profile?.image,
+  );
 
   const isLoading = isPending || (!!session && isProfileLoading);
 
@@ -71,7 +74,7 @@ export function Header() {
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Search className="size-4" />
               </Button>
-              <Link to="/">
+              <Link to="/posts/new">
                 <Button className="hidden md:block cursor-pointer">
                   Create Post
                 </Button>
@@ -90,10 +93,7 @@ export function Header() {
                       {imageLoading ? (
                         <AvatarFallback className="bg-muted" />
                       ) : imageUrl ? (
-                        <AvatarImage
-                          src={imageUrl}
-                          alt={profile?.name ?? ""}
-                        />
+                        <AvatarImage src={imageUrl} alt={profile?.name ?? ""} />
                       ) : (
                         <AvatarFallback>
                           {profile?.name?.charAt(0).toUpperCase() ?? ""}
@@ -102,10 +102,7 @@ export function Header() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-32"
-                  align="end"
-                >
+                <DropdownMenuContent className="w-32" align="end">
                   <DropdownMenuItem asChild>
                     {profile?.username ? (
                       <Link
@@ -114,7 +111,9 @@ export function Header() {
                         className="flex flex-col items-start gap-0 cursor-pointer"
                       >
                         <span>{profile.name}</span>
-                        <span className="leading-none">@{profile.username}</span>
+                        <span className="leading-none">
+                          @{profile.username}
+                        </span>
                       </Link>
                     ) : (
                       <Link
@@ -122,7 +121,9 @@ export function Header() {
                         className="flex flex-col items-start gap-0 cursor-pointer"
                       >
                         <span>{profile?.name}</span>
-                        <span className="text-xs text-muted-foreground">Set up username</span>
+                        <span className="text-xs text-muted-foreground">
+                          Set up username
+                        </span>
                       </Link>
                     )}
                   </DropdownMenuItem>
