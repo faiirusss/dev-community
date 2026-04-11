@@ -11,6 +11,7 @@ import { TitleInput } from "../components/TitleInput";
 import { TagsInput } from "../components/TagsInput";
 import { MarkdownEditor } from "../components/MarkdownEditor";
 import { PostStats } from "../components/PostStats";
+import { ExitConfirmationDialog } from "../components/ExitConfirmationDialog";
 import { postFormSchema, generateSlug } from "../forms/post";
 import type { PostFormSchema } from "../forms/post";
 
@@ -43,7 +44,7 @@ export function EditPostPage() {
   const updatePost = trpc.posts.update.useMutation({
     onSuccess: (data) => {
       toast({ title: "Post updated!", description: "Your changes have been saved." });
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/" });
     },
     onError: (error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -64,7 +65,8 @@ export function EditPostPage() {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="min-h-screen pb-24">
+      <form onSubmit={handleSubmit(onSubmit)} className="min-h-screen pb-24 relative">
+        <ExitConfirmationDialog onConfirm={() => navigate({ to: "/" })} />
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="mb-4 text-sm text-muted-foreground">
             Editing post • Last edited {post.editedAt ? new Date(post.editedAt).toLocaleDateString() : "never"}
@@ -129,7 +131,7 @@ export function EditPostPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate({ to: "/dashboard" })}
+                onClick={() => navigate({ to: "/" })}
               >
                 Cancel
               </Button>
